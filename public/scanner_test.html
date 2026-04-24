@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Scanner SA9007</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .scanner-box { background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; border-radius: 15px; color: white; margin-bottom: 20px; }
+        .scanner-input { width: 100%; padding: 15px; font-size: 18px; border: none; border-radius: 10px; }
+        .product-info { background: white; padding: 20px; border-radius: 10px; margin-top: 20px; display: none; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #10b981; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .success { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-top: 10px; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #667eea; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖨️ Test Scanner SA9007</h1>
+        
+        <div class="scanner-box">
+            <h2>Scanner un produit</h2>
+            <p>Scannez un code-barres ou entrez-le manuellement:</p>
+            <input type="text" id="barcode" class="scanner-input" placeholder="Scannez ici..." autofocus>
+            <div id="status" style="margin-top: 10px;"></div>
+        </div>
+        
+        <div id="productInfo" class="product-info">
+            <h3>📦 Produit scanné</h3>
+            <div id="productDetails"></div>
+        </div>
+        
+        <form id="stockForm" style="display: none;">
+            <div class="form-group">
+                <label>Quantité:</label>
+                <input type="number" id="quantity" min="1" value="1">
+            </div>
+            <button type="submit">✅ Enregistrer l'entrée</button>
+        </form>
+        
+        <div style="margin-top: 30px;">
+            <h3>📋 Produits en base de données</h3>
+            <div id="productsList">Chargement...</div>
+        </div>
+    </div>
+    
+    <script>
+        // Données de test en dur (à remplacer par votre API)
+        const testProducts = [
+            { id: 1, barcode: "123456789", name: "Produit Test 1", price: 1000, stock: 50 },
+            { id: 2, barcode: "987654321", name: "Produit Test 2", price: 2500, stock: 30 },
+            { id: 3, barcode: "555555555", name: "Produit Test 3", price: 500, stock: 100 }
+        ];
+        
+        // Afficher la liste des produits
+        function displayProducts() {
+            const html = `
+                <table>
+                    <thead>
+                        <tr><th>Code-barres</th><th>Nom</th><th>Prix</th><th>Stock</th></tr>
+                    </thead>
+                    <tbody>
+                        ${testProducts.map(p => `
+                            <tr onclick="simulateScan('${p.barcode}')" style="cursor:pointer">
+                                <td><code>${p.barcode}</code></td>
+                                <td>${p.name}</td>
+                                <td>${p.price} G</td>
+                                <td>${p.stock}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <p style="margin-top: 10px; color: #666;">💡 Cliquez sur un produit pour simuler un scan</p>
+            `;
+            document.getElementById('productsList').innerHTML = html;
+        }
+        
+        let currentProduct = null;
+        
+        function simulateScan(barcode) {
+            document.getElementById('barcode').value = barcode;
+            scanBarcode(barcode);
+        }
+        
+        function scanBarcode(barcode) {
+            const product = testProducts.find(p => p.barcode === barcode);
+            const statusDiv = document.getElementById('status');
+            
+            if (product) {
+                currentProduct = product;
+                document.getElementById('productDetails').innerHTML = `
+                    <p><strong>Nom:</strong> ${product.name}</p>
+                    <p><strong>Code:</strong> ${product.barcode}</p>
+                    <p><strong>Stock actuel:</strong> ${product.stock}</p>
+                    <p><strong>Prix:</strong> ${product.price} G</p>
+                `;
+                document.getElementById('productInfo').style.display = 'block';
+                document.getElementById('stockForm').style.display = 'block';
+                statusDiv.innerHTML = '<div class="success">✅ Produit trouvé! Entrez la quantité.</div>';
+                document.getElementById('quantity').focus();
+            } else {
+                document.getElementById('productInfo').style.display = 'none';
+                document.getElementById('stockForm').style.display = 'none';
+                statusDiv.innerHTML = `<div class="error">❌ Produit non trouvé: ${barcode}</div>`;
+            }
+        }
+        
+        // Scanner input
+        const barcodeInput = document.getElementById('barcode');
+        barcodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const barcode = this.value.trim();
+                if (barcode) {
+                    scanBarcode(barcode);
+                    this.value = '';
+                }
+            }
+        });
+        
+        // Formulaire
+        document.getElementById('stockForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const quantity = document.getElementById('quantity').value;
+            const statusDiv = document.getElementById('status');
+            
+            if (currentProduct) {
+                statusDiv.innerHTML = `
+                    <div class="success">
+                        ✅ Entrée enregistrée!<br>
+                        Produit: ${currentProduct.name}<br>
+                        Quantité: ${quantity}<br>
+                        Nouveau stock: ${currentProduct.stock + parseInt(quantity)}
+                    </div>
+                `;
+                
+                // Mettre à jour le stock
+                currentProduct.stock += parseInt(quantity);
+                displayProducts();
+                
+                // Réinitialiser
+                document.getElementById('productInfo').style.display = 'none';
+                document.getElementById('stockForm').style.display = 'none';
+                currentProduct = null;
+                
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 3000);
+            }
+        });
+        
+        // Focus automatique
+        setInterval(() => barcodeInput.focus(), 1000);
+        
+        // Initialiser
+        displayProducts();
+        
+        console.log('✅ Scanner SA9007 prêt - Mode test');
+    </script>
+</body>
+</html>

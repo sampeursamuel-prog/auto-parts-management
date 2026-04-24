@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test POS</title>
+</head>
+<body>
+    <h2>Test API POS</h2>
+    <button onclick="testApi()">Tester l'API</button>
+    <div id="result"></div>
+
+    <script>
+    async function testApi() {
+        const testData = {
+            cart: [{id: 1, name: "Test", price: 1000, quantity: 1}],
+            total: 1000,
+            received: 1000,
+            change: 0,
+            payment_method: "cash"
+        };
+
+        try {
+            const response = await fetch('/auto-parts-management/public/pos_payment.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(testData)
+            });
+            
+            const text = await response.text();
+            document.getElementById('result').innerHTML = '<pre>Réponse brute: ' + text + '</pre>';
+            
+            try {
+                const data = JSON.parse(text);
+                document.getElementById('result').innerHTML += '<pre>JSON parsé: ' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch(e) {
+                document.getElementById('result').innerHTML += '<pre style="color:red">Erreur JSON: ' + e.message + '</pre>';
+            }
+        } catch(error) {
+            document.getElementById('result').innerHTML = '<pre style="color:red">Erreur: ' + error.message + '</pre>';
+        }
+    }
+    </script>
+</body>
+</html>

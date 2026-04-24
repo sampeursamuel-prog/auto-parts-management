@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API POS</title>
+</head>
+<body>
+    <h2>Test de l'API POS</h2>
+    <button onclick="testAPI()">Tester l'API</button>
+    <pre id="result"></pre>
+
+    <script>
+    function testAPI() {
+        const testData = {
+            cart: [
+                {id: 1, name: "Produit test", price: 1000, quantity: 2, stock: 10}
+            ],
+            total: 2000,
+            received: 2500,
+            change: 500,
+            payment_method: "cash",
+            client_id: null,
+            devise: "HTG"
+        };
+
+        fetch('/auto-parts-management/public/process_sale_complete.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(testData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+        })
+        .catch(error => {
+            document.getElementById('result').innerHTML = 'Erreur: ' + error.message;
+        });
+    }
+    </script>
+</body>
+</html>
