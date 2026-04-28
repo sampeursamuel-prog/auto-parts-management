@@ -11,7 +11,7 @@ class Database
     
     private function __construct()
     {
-        $host = 'localhost';
+        $host = getenv('DB_HOST') ?: 'localhost';
         $dbname = 'autoparts_db';
         $username = 'root';
         $password = '';
