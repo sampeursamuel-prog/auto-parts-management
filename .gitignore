@@ -1,0 +1,13 @@
+# Claude Code
+.claude/
+
+# Dépendances
+vendor/
+Vendor/
+
+# Uploads utilisateurs
+public/uploads/
+
+# Environnement local
+.env
+.env.local
