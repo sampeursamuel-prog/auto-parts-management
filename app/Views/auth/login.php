@@ -115,11 +115,11 @@ $flash = \App\Helpers\Session::getFlash();
         <form method="POST" action="<?php echo \BASE_PATH; ?>/index.php?action=doLogin">
             <div class="form-group">
                 <label>Nom d'utilisateur</label>
-                <input type="text" name="username" required autofocus>
+                <input type="text" name="username" required autofocus placeholder="Entrez votre nom d'utilisateur">
             </div>
             <div class="form-group">
                 <label>Mot de passe</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" required placeholder="Entrez votre mot de passe">
             </div>
             <button type="submit">Se connecter</button>
         </form>
